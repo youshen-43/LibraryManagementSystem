@@ -1,6 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form
+      :model="queryParams"
+      ref="queryRef"
+      :inline="true"
+      v-show="showSearch"
+      label-width="68px"
+    >
       <el-form-item label="书籍名称" prop="bookName">
         <el-input
           v-model="queryParams.bookName"
@@ -26,11 +32,13 @@
         />
       </el-form-item>
       <el-form-item label="出版日期" prop="publishDate">
-        <el-date-picker clearable
+        <el-date-picker
+          clearable
           v-model="queryParams.publishDate"
           type="date"
           value-format="YYYY-MM-DD"
-          placeholder="请选择出版日期">
+          placeholder="请选择出版日期"
+        >
         </el-date-picker>
       </el-form-item>
       <el-form-item label="价格" prop="price">
@@ -49,32 +57,45 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
+
       <el-form-item label="地区id" prop="regionId">
-        <el-input
+        <el-select
+          style="width: 200px"
           v-model="queryParams.regionId"
-          placeholder="请输入地区id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+          placeholder="请选择所属地区"
+          @change="handleQuery"
+        >
+          <el-option
+            v-for="item in regionList"
+            :key="item.id"
+            :label="item.regionName"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
+
       <el-form-item label="类别id" prop="categoryId">
         <el-input
           v-model="queryParams.categoryId"
-          placeholder="请输入类别id"
+          placeholder="请输入所属类别"
           clearable
           @keyup.enter="handleQuery"
         />
       </el-form-item>
       <el-form-item label="修改时间" prop="dateTime">
-        <el-date-picker clearable
+        <el-date-picker
+          clearable
           v-model="queryParams.dateTime"
           type="date"
           value-format="YYYY-MM-DD"
-          placeholder="请选择修改时间">
+          placeholder="请选择修改时间"
+        >
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery"
+          >搜索
+        </el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -87,7 +108,8 @@
           icon="Plus"
           @click="handleAdd"
           v-hasPermi="['manage:book:add']"
-        >新增</el-button>
+          >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -97,7 +119,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['manage:book:edit']"
-        >修改</el-button>
+          >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -107,7 +130,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['manage:book:remove']"
-        >删除</el-button>
+          >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -116,47 +140,95 @@
           icon="Download"
           @click="handleExport"
           v-hasPermi="['manage:book:export']"
-        >导出</el-button>
+          >导出
+        </el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar
+        v-model:showSearch="showSearch"
+        @queryTable="getList"
+      ></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="bookList" @selection-change="handleSelectionChange">
+    <el-table
+      v-loading="loading"
+      :data="bookList"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="序号" type="index" width="55" align="center" prop="id" />
+      <el-table-column
+        label="序号"
+        type="index"
+        width="55"
+        align="center"
+        prop="id"
+      />
       <el-table-column label="书籍名称" align="center" prop="bookName" />
-      <el-table-column label="封面" align="center" prop="coverImage" width="100">
+      <el-table-column
+        label="封面"
+        align="center"
+        prop="coverImage"
+        width="100"
+      >
         <template #default="scope">
-          <image-preview :src="scope.row.coverImage" :width="50" :height="50"/>
+          <image-preview :src="scope.row.coverImage" :width="50" :height="50" />
         </template>
       </el-table-column>
       <el-table-column label="作者" align="center" prop="author" />
       <el-table-column label="出版社" align="center" prop="publisher" />
-      <el-table-column label="出版日期" align="center" prop="publishDate" width="180">
+      <el-table-column
+        label="出版日期"
+        align="center"
+        prop="publishDate"
+        width="180"
+      >
         <template #default="scope">
-          <span>{{ parseTime(scope.row.publishDate, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.publishDate, "{y}-{m}-{d}") }}</span>
         </template>
       </el-table-column>
       <el-table-column label="价格" align="center" prop="price" />
       <el-table-column label="数量" align="center" prop="quantity" />
       <el-table-column label="地区id" align="center" prop="regionName" />
       <el-table-column label="类别id" align="center" prop="categoryName" />
-      <el-table-column label="修改时间" align="center" prop="dateTime" width="180">
+      <el-table-column
+        label="修改时间"
+        align="center"
+        prop="dateTime"
+        width="180"
+      >
         <template #default="scope">
-          <span>{{ parseTime(scope.row.dateTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.dateTime, "{y}-{m}-{d}") }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        class-name="small-padding fixed-width"
+      >
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['manage:book:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['manage:book:remove']">删除</el-button>
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['manage:book:edit']"
+          >
+            修改
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            icon="Delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['manage:book:remove']"
+            >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       v-model:page="queryParams.pageNum"
       v-model:limit="queryParams.pageSize"
@@ -170,7 +242,7 @@
           <el-input v-model="form.bookName" placeholder="请输入书籍名称" />
         </el-form-item>
         <el-form-item label="封面" prop="coverImage">
-          <image-upload v-model="form.coverImage"/>
+          <image-upload v-model="form.coverImage" />
         </el-form-item>
         <el-form-item label="作者" prop="author">
           <el-input v-model="form.author" placeholder="请输入作者" />
@@ -179,11 +251,13 @@
           <el-input v-model="form.publisher" placeholder="请输入出版社" />
         </el-form-item>
         <el-form-item label="出版日期" prop="publishDate">
-          <el-date-picker clearable
+          <el-date-picker
+            clearable
             v-model="form.publishDate"
             type="date"
             value-format="YYYY-MM-DD"
-            placeholder="请选择出版日期">
+            placeholder="请选择出版日期"
+          >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="价格" prop="price">
@@ -199,15 +273,21 @@
           <el-input v-model="form.categoryId" placeholder="请输入类别id" />
         </el-form-item>
         <el-form-item label="修改时间" prop="dateTime">
-          <el-date-picker clearable
+          <el-date-picker
+            clearable
             v-model="form.dateTime"
             type="date"
             value-format="YYYY-MM-DD"
-            placeholder="请选择修改时间">
+            placeholder="请选择修改时间"
+          >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input
+            v-model="form.remark"
+            type="textarea"
+            placeholder="请输入内容"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -221,7 +301,14 @@
 </template>
 
 <script setup name="Book">
-import { listBook, getBook, delBook, addBook, updateBook } from "@/api/manage/book";
+import {
+  listBook,
+  getBook,
+  delBook,
+  addBook,
+  updateBook,
+} from "@/api/manage/book";
+import { listRegion } from "@/api/manage/region";
 
 const { proxy } = getCurrentInstance();
 
@@ -253,21 +340,13 @@ const data = reactive({
   },
   rules: {
     bookName: [
-      { required: true, message: "书籍名称不能为空", trigger: "blur" }
+      { required: true, message: "书籍名称不能为空", trigger: "blur" },
     ],
-    author: [
-      { required: true, message: "作者不能为空", trigger: "blur" }
-    ],
-    publisher: [
-      { required: true, message: "出版社不能为空", trigger: "blur" }
-    ],
-    price: [
-      { required: true, message: "价格不能为空", trigger: "blur" }
-    ],
-    quantity: [
-      { required: true, message: "数量不能为空", trigger: "blur" }
-    ],
-  }
+    author: [{ required: true, message: "作者不能为空", trigger: "blur" }],
+    publisher: [{ required: true, message: "出版社不能为空", trigger: "blur" }],
+    price: [{ required: true, message: "价格不能为空", trigger: "blur" }],
+    quantity: [{ required: true, message: "数量不能为空", trigger: "blur" }],
+  },
 });
 
 const { queryParams, form, rules } = toRefs(data);
@@ -275,10 +354,23 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询书籍管理列表 */
 function getList() {
   loading.value = true;
-  listBook(queryParams.value).then(response => {
+  listBook(queryParams.value).then((response) => {
     bookList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  });
+}
+
+const loadAllParam = reactive({
+  pageNum: 1,
+  pageSize: 10000,
+});
+// 查询区域管理列表
+const regionList = ref([]);
+
+function getRegionNameList() {
+  listRegion(loadAllParam).then((response) => {
+    regionList.value = response.rows;
   });
 }
 
@@ -305,7 +397,7 @@ function reset() {
     dateTime: null,
     createBy: null,
     updateBy: null,
-    remark: null
+    remark: null,
   };
   proxy.resetForm("bookRef");
 }
@@ -324,7 +416,7 @@ function resetQuery() {
 
 // 多选框选中数据
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.id);
+  ids.value = selection.map((item) => item.id);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
@@ -339,8 +431,8 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const _id = row.id || ids.value
-  getBook(_id).then(response => {
+  const _id = row.id || ids.value;
+  getBook(_id).then((response) => {
     form.value = response.data;
     open.value = true;
     title.value = "修改书籍管理";
@@ -349,16 +441,16 @@ function handleUpdate(row) {
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["bookRef"].validate(valid => {
+  proxy.$refs["bookRef"].validate((valid) => {
     if (valid) {
       if (form.value.id != null) {
-        updateBook(form.value).then(response => {
+        updateBook(form.value).then((response) => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addBook(form.value).then(response => {
+        addBook(form.value).then((response) => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
@@ -371,20 +463,29 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除书籍管理编号为"' + _ids + '"的数据项？').then(function() {
-    return delBook(_ids);
-  }).then(() => {
-    getList();
-    proxy.$modal.msgSuccess("删除成功");
-  }).catch(() => {});
+  proxy.$modal
+    .confirm('是否确认删除书籍管理编号为"' + _ids + '"的数据项？')
+    .then(function () {
+      return delBook(_ids);
+    })
+    .then(() => {
+      getList();
+      proxy.$modal.msgSuccess("删除成功");
+    })
+    .catch(() => {});
 }
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.download('manage/book/export', {
-    ...queryParams.value
-  }, `book_${new Date().getTime()}.xlsx`)
+  proxy.download(
+    "manage/book/export",
+    {
+      ...queryParams.value,
+    },
+    `book_${new Date().getTime()}.xlsx`
+  );
 }
 
+getRegionNameList();
 getList();
 </script>
