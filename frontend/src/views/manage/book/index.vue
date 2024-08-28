@@ -75,12 +75,25 @@
       </el-form-item>
 
       <el-form-item label="类别id" prop="categoryId">
-        <el-input
-          v-model="queryParams.categoryId"
-          placeholder="请输入所属类别"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+<!--        <el-input-->
+<!--          v-model="queryParams.categoryId"-->
+<!--          placeholder="请输入所属类别"-->
+<!--          clearable-->
+<!--          @keyup.enter="handleQuery"-->
+<!--        />-->
+        <el-select
+            style="width: 200px"
+            v-model="queryParams.categoryId"
+            placeholder="请选择所属类别"
+            @change="handleQuery"
+        >
+          <el-option
+              v-for="item in categoryList"
+              :key="item.id"
+              :label="item.categoryName"
+              :value="item.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="修改时间" prop="dateTime">
         <el-date-picker
@@ -267,10 +280,36 @@
           <el-input v-model="form.quantity" placeholder="请输入数量" />
         </el-form-item>
         <el-form-item label="地区id" prop="regionId">
-          <el-input v-model="form.regionId" placeholder="请输入地区id" />
+<!--          <el-input v-model="form.regionId" placeholder="请输入地区id" />-->
+          <el-select
+              style="width: 200px"
+              v-model="queryParams.regionId"
+              placeholder="请选择所属地区"
+              @change="handleQuery"
+          >
+            <el-option
+                v-for="item in regionList"
+                :key="item.id"
+                :label="item.regionName"
+                :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="类别id" prop="categoryId">
-          <el-input v-model="form.categoryId" placeholder="请输入类别id" />
+<!--          <el-input v-model="form.categoryId" placeholder="请输入类别id" />-->
+          <el-select
+              style="width: 200px"
+              v-model="queryParams.categoryId"
+              placeholder="请选择所属类别"
+              @change="handleQuery"
+          >
+            <el-option
+                v-for="item in categoryList"
+                :key="item.id"
+                :label="item.categoryName"
+                :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="修改时间" prop="dateTime">
           <el-date-picker
@@ -309,6 +348,8 @@ import {
   updateBook,
 } from "@/api/manage/book";
 import { listRegion } from "@/api/manage/region";
+import { listCategory } from "@/api/manage/category";
+
 
 const { proxy } = getCurrentInstance();
 
@@ -373,7 +414,14 @@ function getRegionNameList() {
     regionList.value = response.rows;
   });
 }
+// 查询类别管理列表
+const categoryList = ref([]);
 
+function getCategoryNameList() {
+  listCategory(loadAllParam).then((response) => {
+    categoryList.value = response.rows;
+  });
+}
 // 取消按钮
 function cancel() {
   open.value = false;
@@ -487,5 +535,6 @@ function handleExport() {
 }
 
 getRegionNameList();
+getCategoryNameList();
 getList();
 </script>
